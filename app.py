@@ -15,9 +15,9 @@ db = client.blog
 blog_posts = db.posts
 
 parser = reqparse.RequestParser(bundle_errors=True)
-parser.add_argument('title', type=str, required=True, help="No debe estar vacio")
-parser.add_argument('author', type=str, required=True, help="No debe estar vacio")
-parser.add_argument('text_post', type=str, required=True, help="No debe estar vacio")
+parser.add_argument('title', type=str, required=True, help="title es un dato obligatorio")
+parser.add_argument('author', type=str, required=True, help="author es un dato obligatorio")
+parser.add_argument('text_post', type=str, required=True, help="text_post es un dato obligatorio")
 parser.add_argument('comment_author')
 parser.add_argument('comment_text')
 
@@ -45,7 +45,7 @@ class PostList(Resource):
         return post_list
 
 
-class PostSave(Resource):
+class PostAdd(Resource):
     def post(self):
         args = parser.parse_args()
         if args['title'] == '' or args['author'] == '' or args['text_post'] == '':
@@ -60,7 +60,7 @@ class PostSave(Resource):
         blog_posts.insert_one(post)
         return {'result': True}
 
-class PostById(Resource):
+class Post(Resource):
     def get(self, post_id):
         if not ObjectId.is_valid(post_id):
             return {'message': 'El ID no es valido.'}
@@ -74,10 +74,17 @@ class PostById(Resource):
         post['date'] = str(post['date'])
         return post
 
+    def put(self, post_id):
+        args = parser.parse_args()
+        query = {'_id': post_id}, {'author': 'gente'}
+        blog_posts.update_one(query)
+
+        return True
+
 
 api.add_resource(PostList, '/api/posts')
-api.add_resource(PostSave, '/api/posts/save')
-api.add_resource(PostById, '/api/posts/<string:post_id>')
+api.add_resource(PostAdd, '/api/posts/add')
+api.add_resource(Post, '/api/posts/<string:post_id>')
 
 if __name__ == '__main__':
     app.run(debug=True)

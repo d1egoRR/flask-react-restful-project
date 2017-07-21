@@ -50,7 +50,6 @@ class TestBlog(unittest.TestCase):
     def test_get_postslist(self):
         response = self.app.get('/api/posts')
         result = json.loads(response.get_data())
-
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0]['title'], 'Title Test')
         self.assertEqual(result[0]['author'], 'Test')
@@ -68,6 +67,42 @@ class TestBlog(unittest.TestCase):
         result = json.loads(response.get_data())
         self.assertEqual(result['title'], 'Title Test 2')
         self.assertEqual(result['author'], 'Test2')
+
+    def test_post_save(self):
+        response = self.app.post('/api/posts/add')
+        result = json.loads(response.get_data())
+        self.assertIn('title', result['message'])
+        self.assertIn('author', result['message'])
+        self.assertIn('text_post', result['message'])
+        self.assertEqual(result['message']['title'], 'title es un dato obligatorio')
+
+        post = dict(title='titulo post', text_post='texto post')
+        response = self.app.post('/api/posts/add', data=post)
+        result = json.loads(response.get_data())
+        self.assertIn('author', result['message'])
+        self.assertEqual(result['message']['author'], 'author es un dato obligatorio')
+
+        post['author'] = ''
+        response = self.app.post('/api/posts/add', data=post)
+        result = json.loads(response.get_data())
+        self.assertFalse(result['result']) # author en blanco
+
+        post['author'] = 'test_author'
+        response = self.app.post('/api/posts/add', data=post)
+        result = json.loads(response.get_data())
+        self.assertTrue(result['result']) # se guardo OK
+
+        response = self.app.get('/api/posts')
+        result = json.loads(response.get_data())
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[2]['title'], 'titulo post')
+        self.assertEqual(result[2]['author'], 'test_author')
+
+    def test_put_with_param_id(self):
+        post = dict(title='titulo post', text_post='texto post', author='na')
+        response = self.app.put('/api/posts/596e7ba15265ab2bd33bfabf', data=post)
+        result = json.loads(response.get_data())
+        print result
 
 if __name__ == '__main__':
     unittest.main()
