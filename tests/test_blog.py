@@ -13,11 +13,11 @@ from pymongo import MongoClient
 import app
 
 
-class TestBlog(unittest.TestCase):
+class TestPost(unittest.TestCase):
     def setUp(self):
         self.app = app.app.test_client()
         self.post_id = '596e7ba15265ab2bd33bfaba'
-        self.post_id_non_existent = '706e7ba15265ab2bd33bfaba'
+        self.post_id_no_exist = '706e7ba15265ab2bd33bfaba'
         self.post_id_no_valid = '596e7ba15265ab2bd33bfabacd'
         self.connect_db()
         self.insert_posts()
@@ -62,7 +62,7 @@ class TestBlog(unittest.TestCase):
         result = json.loads(response.get_data())
         self.assertEqual(result['message'], 'El ID no es valido.')
 
-        response = self.app.get('/api/posts/' + self.post_id_non_existent)
+        response = self.app.get('/api/posts/' + self.post_id_no_exist)
         result = json.loads(response.get_data())
         self.assertEqual(result['message'], 'No existe el post.')
 
@@ -74,23 +74,10 @@ class TestBlog(unittest.TestCase):
     def test_post_add(self):
         response = self.app.post('/api/posts/add')
         result = json.loads(response.get_data())
-        self.assertIn('title', result['message'])
-        self.assertIn('author', result['message'])
-        self.assertIn('text_post', result['message'])
-        self.assertEqual(result['message']['title'], 'title es un dato obligatorio')
+        self.assertFalse(result['result'])
+        self.assertEqual(result['message'], 'Titulo, autor y post son obligatorios')
 
-        post = dict(title='titulo post', text_post='texto post')
-        response = self.app.post('/api/posts/add', data=post)
-        result = json.loads(response.get_data())
-        self.assertIn('author', result['message'])
-        self.assertEqual(result['message']['author'], 'author es un dato obligatorio')
-
-        post['author'] = ''
-        response = self.app.post('/api/posts/add', data=post)
-        result = json.loads(response.get_data())
-        self.assertFalse(result['result']) # author en blanco
-
-        post['author'] = 'test_author'
+        post = dict(title='titulo post', text_post='texto post', author='test_author')
         response = self.app.post('/api/posts/add', data=post)
         result = json.loads(response.get_data())
         self.assertTrue(result['result']) # se guardo OK
@@ -102,19 +89,13 @@ class TestBlog(unittest.TestCase):
         self.assertEqual(result[2]['author'], 'test_author')
 
     def test_put(self):
-        post = dict(title='titulo modificado', text_post='texto modificado')
-        response = self.app.put('/api/posts/' + self.post_id, data=post)
+        response = self.app.put('/api/posts/' + self.post_id)
         result = json.loads(response.get_data())
-        self.assertIn('author', result['message'])
-        self.assertEqual(result['message']['author'], 'author es un dato obligatorio')
+        self.assertFalse(result['result'])
+        self.assertEqual(result['message'], 'Titulo, autor y post son obligatorios')
 
-        post['author'] = ''
-        response = self.app.put('/api/posts/' + self.post_id, data=post)
-        result = json.loads(response.get_data())
-        self.assertFalse(result['result']) # author en blanco
-
-        post['author'] = 'author modificado'
-        response = self.app.put('/api/posts/' + self.post_id_non_existent, data=post)
+        post = dict(title='titulo modificado', text_post='texto modificado', author='author modificado')
+        response = self.app.put('/api/posts/' + self.post_id_no_exist, data=post)
         result = json.loads(response.get_data())
         self.assertFalse(result['result']) # ID NO EXISTENTE
 
@@ -130,6 +111,88 @@ class TestBlog(unittest.TestCase):
         result = json.loads(response.get_data())
         self.assertEqual(result['title'], 'titulo modificado')
         self.assertEqual(result['author'], 'author modificado')
+
+    def test_delete(self):
+        response = self.app.delete('/api/posts/' + self.post_id_no_valid)
+        result = json.loads(response.get_data())
+        self.assertFalse(result['result'])
+        self.assertEqual(result['message'], 'El ID no es valido.')
+
+        response = self.app.delete('/api/posts/' + self.post_id_no_exist)
+        result = json.loads(response.get_data())
+        self.assertFalse(result['result'])
+
+        response = self.app.delete('/api/posts/' + self.post_id)
+        result = json.loads(response.get_data())
+        self.assertTrue(result['result'])
+
+        response = self.app.get('/api/posts')
+        result = json.loads(response.get_data())
+        self.assertEqual(len(result), 1)
+
+        response = self.app.get('/api/posts/' + self.post_id)
+        result = json.loads(response.get_data())
+        self.assertEqual(result['message'], 'No existe el post.')
+
+
+class TestComment(unittest.TestCase):
+    def setUp(self):
+        self.app = app.app.test_client()
+        self.post_id = '596e7ba15265ab2bd33bfaba'
+        self.post_id_no_exist = '706e7ba15265ab2bd33bfaba'
+        self.post_id_no_valid = '596e7ba15265ab2bd33bfabacd'
+        self.connect_db()
+        self.insert_posts()
+
+    def connect_db(self):
+        self.client = MongoClient('localhost', 27017)
+        app.db = self.client.test_blog
+        app.blog_posts = app.db.posts
+
+    def insert_posts(self):
+        post1 = {
+            '_id': ObjectId('596e7ba15265ab2bd33bfaba'),
+            'title': 'Title Test',
+            'author': 'Test',
+            'text_post': 'Text Test',
+            'date': datetime.utcnow()
+        }
+
+        post2 = {
+            '_id': ObjectId('606e7ba15265ab2bd33bfaba'),
+            'title': 'Title Test 2',
+            'author': 'Test2',
+            'text_post': 'Text Test 2',
+            'date': datetime.utcnow()
+        }
+
+        app.blog_posts.insert_one(post1)
+        app.blog_posts.insert_one(post2)
+
+    def tearDown(self):
+        self.client.drop_database('test_blog')
+
+    def test_put(self):
+        response = self.app.put('/api/comments/add/' + self.post_id_no_valid)
+        result = json.loads(response.get_data())
+        self.assertFalse(result['result'])
+        self.assertEqual(result['message'], 'El ID no es valido.')
+
+        response = self.app.put('/api/comments/add/' + self.post_id)
+        result = json.loads(response.get_data())
+        self.assertFalse(result['result'])
+        self.assertEqual(result['message'], 'Titulo, autor y post son obligatorios')
+
+        comment = dict(comment_author='test', comment_text='text test')
+        response = self.app.put('/api/comments/add/' + self.post_id_no_exist, data=comment)
+        result = json.loads(response.get_data())
+        self.assertFalse(result['result'])
+        self.assertEqual(result['message'], 'No existe el post.')
+
+        response = self.app.put('/api/comments/add/' + self.post_id, data=comment)
+        result = json.loads(response.get_data())
+        self.assertTrue(result['result'])
+
 
 if __name__ == '__main__':
     unittest.main()
