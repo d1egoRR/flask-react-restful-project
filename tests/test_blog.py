@@ -181,7 +181,7 @@ class TestComment(unittest.TestCase):
         response = self.app.put('/api/comments/add/' + self.post_id)
         result = json.loads(response.get_data())
         self.assertFalse(result['result'])
-        self.assertEqual(result['message'], 'Titulo, autor y post son obligatorios')
+        self.assertEqual(result['message'], 'Comentario y autor son obligatorios')
 
         comment = dict(comment_author='test', comment_text='text test')
         response = self.app.put('/api/comments/add/' + self.post_id_no_exist, data=comment)

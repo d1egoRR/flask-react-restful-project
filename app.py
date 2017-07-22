@@ -4,7 +4,6 @@ from datetime import datetime
 
 from flask import Flask, render_template
 from flask_restful import Resource, Api, reqparse, abort
-#from flask.views import View
 from pymongo import MongoClient
 
 app = Flask('blog')
@@ -20,19 +19,6 @@ parser.add_argument('author', type=str)
 parser.add_argument('text_post', type=str)
 parser.add_argument('comment_author', type=str)
 parser.add_argument('comment_text', type=str)
-
-"""
-class PostCreate(View):
-    def __init__(self, template_name):
-        self.template_name = template_name
-
-    def dispatch_request(self):
-        return render_template(self.template_name)
-
-app.add_url_rule(
-    '/posts/create',
-    view_func=PostCreate.as_view('show_posts', 'index.html'))
-"""
 
 
 class PostList(Resource):
@@ -131,7 +117,7 @@ class CommentAdd(Resource):
         if not all([args['comment_author'], args['comment_text']]):
             return {
                 'result': False,
-                'message': 'Titulo, autor y post son obligatorios'}
+                'message': 'Comentario y autor son obligatorios'}
 
         post = blog_posts.find_one({"_id": ObjectId(post_id)})
 
