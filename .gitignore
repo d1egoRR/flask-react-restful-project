@@ -1,4 +1,9 @@
+*.lock
 *.log
 *.pyc
-/venv
+/public
+/build
 /dbs
+/node_modules
+/public
+/venv
