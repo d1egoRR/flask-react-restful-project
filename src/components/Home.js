@@ -1,4 +1,5 @@
 import React from 'react';
+import PostsList from './PostsList';
 import {getPosts} from '../api/BlogAPI';
 
 export default class Home extends React.Component {
@@ -17,7 +18,9 @@ export default class Home extends React.Component {
 
   render() {
     return(
-      <div>HOME</div>
+      <div>
+        <PostsList posts={this.state.posts} />
+      </div>
     );
   }
 }

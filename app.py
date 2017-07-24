@@ -6,7 +6,7 @@ from flask import Flask, render_template, jsonify
 from flask_restful import Resource, Api, reqparse, abort
 from pymongo import MongoClient
 
-from helper.crossdomain import crossdomain
+from utils.crossdomain import crossdomain
 
 app = Flask('blog')
 api = Api(app)
@@ -37,7 +37,6 @@ class PostList(Resource):
             post['date'] = str(post['date'])
             post_list.append(post)
         return jsonify(post_list)
-
 
 class PostAdd(Resource):
     def post(self):
