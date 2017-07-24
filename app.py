@@ -2,9 +2,11 @@
 from bson.objectid import ObjectId
 from datetime import datetime
 
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from flask_restful import Resource, Api, reqparse, abort
 from pymongo import MongoClient
+
+from helper.crossdomain import crossdomain
 
 app = Flask('blog')
 api = Api(app)
@@ -22,14 +24,19 @@ parser.add_argument('comment_text', type=str)
 
 
 class PostList(Resource):
-    def get(self):
-        posts = blog_posts.find()
+    @crossdomain(origin='*')
+    def get(self, page):
+        if page < 1:
+            page = 1
+        limit = 5
+        skip = (page - 1) * limit
+        posts = blog_posts.find().skip(skip).limit(limit)
         post_list = []
         for post in posts:
             post['_id'] = str(post['_id'])
             post['date'] = str(post['date'])
             post_list.append(post)
-        return post_list
+        return jsonify(post_list)
 
 
 class PostAdd(Resource):
@@ -37,9 +44,10 @@ class PostAdd(Resource):
         args = parser.parse_args()
 
         if not all([args['title'], args['author'], args['text_post']]):
-            return {
+            result = {
                 'result': False,
                 'message': 'Titulo, autor y post son obligatorios'}
+            return jsonify(result)
 
         post = {}
         post['title'] = args['title']
@@ -48,38 +56,44 @@ class PostAdd(Resource):
         post['date'] = datetime.utcnow()
 
         blog_posts.insert_one(post)
-        return {'result': True}
+        result = {'result': True}
+        return jsonify(result)
 
 class Post(Resource):
+    @crossdomain(origin='*')
     def get(self, post_id):
         if not ObjectId.is_valid(post_id):
-            return {
+            result = {
                 'result': False,
                 'message': 'El ID no es valido.'}
+            return jsonify(result)
 
         post = blog_posts.find_one({"_id": ObjectId(post_id)})
 
         if post is None:
-            return {
+            result = {
                 'result': False,
                 'message': 'No existe el post.'}
+            return jsonify(result)
 
         post['_id'] = str(post['_id'])
         post['date'] = str(post['date'])
-        return post
+        return jsonify(post)
 
     def put(self, post_id):
         args = parser.parse_args()
 
         if not ObjectId.is_valid(post_id):
-            return {
+            result = {
                 'result': False,
                 'message': 'El ID no es valido.'}
+            return jsonify(result)
 
         if not all([args['title'], args['author'], args['text_post']]):
-            return {
+            result = {
                 'result': False,
                 'message': 'Titulo, autor y post son obligatorios'}
+            return jsonify(result)
 
         filter_query = {'_id': ObjectId(post_id)}
         update_query = {'$set': {
@@ -88,19 +102,22 @@ class Post(Resource):
                             'text_post': args['text_post']}}
 
         result = blog_posts.update_one(filter_query, update_query)
-        return {'result': result.modified_count > 0}
+        result = {'result': result.modified_count > 0}
+        return jsonify(result)
 
     def delete(self, post_id):
         if not ObjectId.is_valid(post_id):
-            return {
+            result = {
                 'result': False,
                 'message': 'El ID no es valido.'}
+            return jsonify(result)
 
         result = blog_posts.delete_one({'_id': ObjectId(post_id)})
-        return {'result': result.deleted_count > 0}
+        result = {'result': result.deleted_count > 0}
+        return jsonify(result)
 
 
-api.add_resource(PostList, '/api/posts')
+api.add_resource(PostList, '/api/postslist/<int:page>')
 api.add_resource(PostAdd, '/api/posts/add')
 api.add_resource(Post, '/api/posts/<string:post_id>')
 
@@ -110,21 +127,24 @@ class CommentAdd(Resource):
         args = parser.parse_args()
 
         if not ObjectId.is_valid(post_id):
-            return {
+            result = {
                 'result': False,
                 'message': 'El ID no es valido.'}
+            return jsonify(result)
 
         if not all([args['comment_author'], args['comment_text']]):
-            return {
+            result = {
                 'result': False,
                 'message': 'Comentario y autor son obligatorios'}
+            return jsonify(result)
 
         post = blog_posts.find_one({"_id": ObjectId(post_id)})
 
         if post is None:
-            return {
+            result = {
                 'result': False,
                 'message': 'No existe el post.'}
+            return jsonify(result)
 
         new_comment = {
             'author': args['comment_author'],
@@ -135,7 +155,8 @@ class CommentAdd(Resource):
             {"_id": ObjectId(post_id)},
             {'$push': {'comments': new_comment}})
 
-        return {'result': result.modified_count > 0}
+        result = {'result': result.modified_count > 0}
+        return jsonify(result)
 
 api.add_resource(CommentAdd, '/api/comments/add/<string:post_id>')
 

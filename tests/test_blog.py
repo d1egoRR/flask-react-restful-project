@@ -19,6 +19,7 @@ class TestPost(unittest.TestCase):
         self.post_id = '596e7ba15265ab2bd33bfaba'
         self.post_id_no_exist = '706e7ba15265ab2bd33bfaba'
         self.post_id_no_valid = '596e7ba15265ab2bd33bfabacd'
+        self.page = 1
         self.connect_db()
         self.insert_posts()
 
@@ -51,11 +52,48 @@ class TestPost(unittest.TestCase):
         self.client.drop_database('test_blog')
 
     def test_get_postslist(self):
-        response = self.app.get('/api/posts')
+        response = self.app.get('/api/postslist/' + str(self.page))
         result = json.loads(response.get_data())
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0]['title'], 'Title Test')
         self.assertEqual(result[0]['author'], 'Test')
+
+    def test_get_postslist_pagination(self):
+        for x in range(1, 22):
+            post = {'title': str(x), 'date': datetime.utcnow()}
+            app.blog_posts.insert_one(post)
+
+        response = self.app.get('/api/postslist/' + str(self.page))
+        result = json.loads(response.get_data())
+        self.assertEqual(len(result), 5)
+        self.assertEqual(result[0]['title'], 'Title Test')
+        self.assertEqual(result[4]['title'], '3')
+
+        self.page = 3
+        response = self.app.get('/api/postslist/' + str(self.page))
+        result = json.loads(response.get_data())
+        self.assertEqual(len(result), 5)
+        self.assertEqual(result[0]['title'], '9')
+        self.assertEqual(result[4]['title'], '13')
+
+        self.page = 5
+        response = self.app.get('/api/postslist/' + str(self.page))
+        result = json.loads(response.get_data())
+        self.assertEqual(len(result), 3)
+        self.assertEqual(result[0]['title'], '19')
+        self.assertEqual(result[2]['title'], '21')
+
+        self.page = 6
+        response = self.app.get('/api/postslist/' + str(self.page))
+        result = json.loads(response.get_data())
+        self.assertEqual(len(result), 0)
+
+        self.page = 0 # devuelve primer pagina
+        response = self.app.get('/api/postslist/' + str(self.page))
+        result = json.loads(response.get_data())
+        self.assertEqual(len(result), 5)
+        self.assertEqual(result[0]['title'], 'Title Test')
+        self.assertEqual(result[4]['title'], '3')
 
     def test_get_with_param_id(self):
         response = self.app.get('/api/posts/' + self.post_id_no_valid)
@@ -82,7 +120,7 @@ class TestPost(unittest.TestCase):
         result = json.loads(response.get_data())
         self.assertTrue(result['result']) # se guardo OK
 
-        response = self.app.get('/api/posts')
+        response = self.app.get('/api/postslist/' + str(self.page))
         result = json.loads(response.get_data())
         self.assertEqual(len(result), 3)
         self.assertEqual(result[2]['title'], 'titulo post')
@@ -126,7 +164,7 @@ class TestPost(unittest.TestCase):
         result = json.loads(response.get_data())
         self.assertTrue(result['result'])
 
-        response = self.app.get('/api/posts')
+        response = self.app.get('/api/postslist/' + str(self.page))
         result = json.loads(response.get_data())
         self.assertEqual(len(result), 1)
 
