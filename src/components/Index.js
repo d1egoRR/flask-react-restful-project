@@ -1,5 +1,5 @@
 import React from 'react';
-import {BrowserRouter} from 'react-router-dom'
+import {HashRouter} from 'react-router-dom'
 
 import Menu from './Menu';
 import Main from './Main';
@@ -7,13 +7,13 @@ import Main from './Main';
 export default class Index extends React.Component {
   render() {
     return(
-      <BrowserRouter>
+      <HashRouter>
         <div>
           <Menu />
           <hr/>
           <Main />
         </div>
-      </BrowserRouter>
+      </HashRouter>
     );
   }
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import {Well} from 'react-bootstrap';
+import {Link} from 'react-router-dom';
 
 export default class Post extends React.Component {
   render() {
@@ -10,7 +11,7 @@ export default class Post extends React.Component {
       <Well>
         <h6>{this.props.title}</h6>
         <p>{text_post}</p>
-        Leer más...
+        <Link to='/post/1'>Leer más...</Link>
       </Well>
     );
   }
