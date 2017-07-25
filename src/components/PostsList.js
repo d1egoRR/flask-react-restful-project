@@ -8,9 +8,7 @@ export default class PostsList extends React.Component {
       return(
         <Row key={post._id}>
           <Col>
-            <Post
-              title={post.title}
-              text_post={post.text_post} />
+            <Post post={post} />
           </Col>
         </Row>
       )

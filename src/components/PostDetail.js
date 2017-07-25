@@ -1,15 +1,36 @@
 import React from 'react';
-import {Well} from 'react-bootstrap';
+import {Grid, Col, Row, Well} from 'react-bootstrap';
 import {Link} from 'react-router-dom';
+import {getPost} from '../api/BlogAPI';
 
 export default class PostDetail extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      'id' : this.props.match.params.id,
+      'post': {}
+    }
+  }
+
+  componentDidMount() {
+    getPost(this.state.id, post => {
+      this.setState({post: post});
+    });
+  }
+
   render() {
     return(
-      <Well>
-        <h6>props.title</h6>
-        <p>text_post</p>
-        <Link to='/'>Volver</Link>
-      </Well>
+      <Grid>
+        <Row>
+          <Col>
+            <Well>
+              <h6>{this.state.post.title}</h6>
+              <p>{this.state.post.text_post}</p>
+              <Link to='/'>Volver</Link>
+            </Well>
+          </Col>
+        </Row>
+      </Grid>
     );
   }
 }

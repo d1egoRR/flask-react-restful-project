@@ -1,6 +1,6 @@
 import React from 'react';
 import PostsList from './PostsList';
-import {getPosts} from '../api/BlogAPI';
+import {getPostsList} from '../api/BlogAPI';
 
 export default class Home extends React.Component {
   constructor(props) {
@@ -11,7 +11,7 @@ export default class Home extends React.Component {
   }
 
   componentDidMount() {
-    getPosts(1, posts => {
+    getPostsList(1, posts => {
       this.setState({posts: posts});
     });
   }
