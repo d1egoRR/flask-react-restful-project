@@ -1,6 +1,7 @@
 import React from 'react';
-import Post from './Post';
 import {Col, Row, Grid} from 'react-bootstrap';
+
+import Post from './Post';
 
 export default class PostsList extends React.Component {
   render() {

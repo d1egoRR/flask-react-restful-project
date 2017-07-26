@@ -1,4 +1,5 @@
 import React from 'react';
+
 import PostsList from './PostsList';
 import {getPostsList} from '../api/BlogAPI';
 

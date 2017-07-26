@@ -1,8 +1,8 @@
 import React from 'react';
 import {HashRouter} from 'react-router-dom'
 
-import Menu from './Menu';
 import Main from './Main';
+import Menu from './Menu';
 
 export default class Index extends React.Component {
   render() {
