@@ -34,7 +34,6 @@ class PostList(Resource):
         post_list = []
         for post in posts:
             post['_id'] = str(post['_id'])
-            post['date'] = str(post['date'])
             post_list.append(post)
         return jsonify(post_list)
 
@@ -76,7 +75,6 @@ class Post(Resource):
             return jsonify(result)
 
         post['_id'] = str(post['_id'])
-        post['date'] = str(post['date'])
         return jsonify(post)
 
     def put(self, post_id):

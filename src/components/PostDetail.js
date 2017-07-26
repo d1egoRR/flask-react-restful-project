@@ -4,13 +4,15 @@ import {Link} from 'react-router-dom';
 import {Parser} from 'html-to-react';
 import {getPost} from '../api/BlogAPI';
 import {getDateTime} from '../utils/getDateTime';
+import CommentForm from './CommentForm';
+import PostComments from './PostComments';
 
 export default class PostDetail extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       "id" : this.props.match.params.id,
-      "post": {}
+      "post": []
     }
   }
 
@@ -21,7 +23,6 @@ export default class PostDetail extends React.Component {
   }
 
   render() {
-    let commentList = "";
     const htmlToReactParser = new Parser();
     const textPost = htmlToReactParser.parse(this.state.post.text_post);
 
@@ -32,14 +33,9 @@ export default class PostDetail extends React.Component {
       });
     }
 
-    if (this.state.post["comments"]) {
-      commentList = this.state.post.comments.map((comment, index) => (
-        <Row key={index}>
-          {comment.text_comment} -- 
-          {comment.author}
-        </Row>
-      ));
-    }
+    const commentList = (this.state.post["comments"])
+                      ? this.state.post.comments
+                      : [];
 
     return(
       <Grid>
@@ -60,11 +56,12 @@ export default class PostDetail extends React.Component {
         </Row>
         <Row>
           <Col>
-            <Well>
-              <h3>Comentarios</h3>
-              <hr></hr>
-              {commentList}
-            </Well>
+            <PostComments comments={commentList} />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <CommentForm />
           </Col>
         </Row>
       </Grid>

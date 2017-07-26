@@ -11,7 +11,8 @@ export default class Home extends React.Component {
   }
 
   componentDidMount() {
-    getPostsList(1, posts => {
+    const page = 1;
+    getPostsList(page, posts => {
       this.setState({posts: posts});
     });
   }

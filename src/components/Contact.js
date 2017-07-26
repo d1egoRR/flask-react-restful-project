@@ -5,11 +5,9 @@ import {
 } from 'react-bootstrap';
 
 function Contact() {
-  const title = "Contacto";
-
   return(
     <Grid>
-      <Panel header={title}>
+      <Panel header={"Contacto"}>
         <form>
           <Row>
             <Col>
