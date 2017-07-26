@@ -1,24 +1,22 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {Col, Row, Grid} from 'react-bootstrap';
-
 import Post from './Post';
 
-export default class PostsList extends React.Component {
-  render() {
-    const postsList = this.props.posts.map(function(post) {
-      return(
-        <Row key={post._id}>
-          <Col>
-            <Post post={post} />
-          </Col>
-        </Row>
-      )
-    });
+function PostsList(props) {
+  const postsList = props.posts.map(post =>
+    <Row key={post._id}>
+      <Col>
+        <Post post={post} />
+      </Col>
+    </Row>
+  );
 
-    return(
-      <Grid>
-        {postsList}
-      </Grid>
-    );
-  }
+  return <Grid>{postsList}</Grid>;
 }
+
+PostsList.propTypes = {
+  posts: PropTypes.array.isRequired
+};
+
+export default PostsList;

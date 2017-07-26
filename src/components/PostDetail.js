@@ -2,15 +2,15 @@ import React from 'react';
 import {Grid, Col, Row, Well} from 'react-bootstrap';
 import {Link} from 'react-router-dom';
 import {Parser} from 'html-to-react';
-
 import {getPost} from '../api/BlogAPI';
+import {getDateTime} from '../utils/getDateTime';
 
 export default class PostDetail extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      'id' : this.props.match.params.id,
-      'post': {}
+      "id" : this.props.match.params.id,
+      "post": {}
     }
   }
 
@@ -20,33 +20,25 @@ export default class PostDetail extends React.Component {
     });
   }
 
-  getDateTime(postDateTime) {
-    if (!postDateTime) {
-      return false;
-    }
-    const result = postDateTime
-                    .split(' ')[0]
-                    .split('-')
-                    .reverse()
-                    .join('/');
-    return result;
-  }
-
   render() {
-    let commentList = '';
+    let commentList = "";
     const htmlToReactParser = new Parser();
-    const postDateTime = this.getDateTime(this.state.post.date);
     const textPost = htmlToReactParser.parse(this.state.post.text_post);
 
-    if (this.state.post['comments']) {
-      commentList = this.state.post.comments.map(function(comment, index) {
-        return(
-          <Row key={index}>
-            {comment.text_comment} -- 
-            {comment.author}
-          </Row>
-        );
+    let postDateTime = "";
+    if (this.state.post.date) {
+      getDateTime(this.state.post.date, result => {
+        postDateTime = result;
       });
+    }
+
+    if (this.state.post["comments"]) {
+      commentList = this.state.post.comments.map((comment, index) => (
+        <Row key={index}>
+          {comment.text_comment} -- 
+          {comment.author}
+        </Row>
+      ));
     }
 
     return(

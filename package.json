@@ -38,6 +38,7 @@
     "axios": "^0.16.2",
     "html-to-react": "^1.2.11",
     "jquery": "^3.2.1",
+    "prop-types": "^15.5.10",
     "react": "^15.6.1",
     "react-bootstrap": "^0.31.1",
     "react-dom": "^15.6.1",
