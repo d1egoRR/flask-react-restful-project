@@ -30,12 +30,16 @@ class PostList(Resource):
             page = 1
         limit = 5
         skip = (page - 1) * limit
+        post_count = blog_posts.count() - 1 # ???
         posts = blog_posts.find().skip(skip).limit(limit)
         post_list = []
         for post in posts:
             post['_id'] = str(post['_id'])
             post_list.append(post)
-        return jsonify(post_list)
+        return jsonify({
+            'posts': post_list,
+            'posts_count': post_count
+            })
 
 class PostAdd(Resource):
     def post(self):

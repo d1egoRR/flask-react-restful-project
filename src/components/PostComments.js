@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {Col, Row, Well, Jumbotron} from 'react-bootstrap';
 import {getDateTime} from '../utils/getDateTime';
 
@@ -30,5 +31,9 @@ function PostComments(props) {
     </Well>
   );
 }
+
+PostComments.propTypes = {
+  comments: PropTypes.array.isRequired
+};
 
 export default PostComments;

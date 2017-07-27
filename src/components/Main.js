@@ -12,6 +12,7 @@ function Main() {
       <Route path="/about" component={About}/>
       <Route path="/contact" component={Contact}/>
       <Route path="/post/:id" component={PostDetail} />
+      <Route path="/posts/:page" component={Home} />
     </main>
   );
 }

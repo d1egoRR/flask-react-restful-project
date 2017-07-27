@@ -1,9 +1,9 @@
 import $ from 'jquery';
 
 export const getPostsList = (page, callback) => {
-  $.get(`http://localhost:5000/api/postslist/${page}`, posts => {
-    callback(posts);
-    console.log(posts);
+  $.get(`http://localhost:5000/api/postslist/${page}`, result => {
+    callback(result);
+    console.log(result);
   });
 }
 
