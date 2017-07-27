@@ -55,8 +55,8 @@ class TestPost(unittest.TestCase):
         response = self.app.get('/api/postslist/' + str(self.page))
         result = json.loads(response.get_data())
         self.assertEqual(len(result), 2)
-        self.assertEqual(result[0]['title'], 'Title Test')
-        self.assertEqual(result[0]['author'], 'Test')
+        self.assertEqual(result['posts'][0]['title'], 'Title Test')
+        self.assertEqual(result['posts'][0]['author'], 'Test')
 
     def test_get_postslist_pagination(self):
         for x in range(1, 22):
@@ -65,35 +65,35 @@ class TestPost(unittest.TestCase):
 
         response = self.app.get('/api/postslist/' + str(self.page))
         result = json.loads(response.get_data())
-        self.assertEqual(len(result), 5)
-        self.assertEqual(result[0]['title'], 'Title Test')
-        self.assertEqual(result[4]['title'], '3')
+        self.assertEqual(len(result['posts']), 5)
+        self.assertEqual(result['posts'][0]['title'], 'Title Test')
+        self.assertEqual(result['posts'][4]['title'], '3')
 
         self.page = 3
         response = self.app.get('/api/postslist/' + str(self.page))
         result = json.loads(response.get_data())
-        self.assertEqual(len(result), 5)
-        self.assertEqual(result[0]['title'], '9')
-        self.assertEqual(result[4]['title'], '13')
+        self.assertEqual(len(result['posts']), 5)
+        self.assertEqual(result['posts'][0]['title'], '9')
+        self.assertEqual(result['posts'][4]['title'], '13')
 
         self.page = 5
         response = self.app.get('/api/postslist/' + str(self.page))
         result = json.loads(response.get_data())
-        self.assertEqual(len(result), 3)
-        self.assertEqual(result[0]['title'], '19')
-        self.assertEqual(result[2]['title'], '21')
+        self.assertEqual(len(result['posts']), 3)
+        self.assertEqual(result['posts'][0]['title'], '19')
+        self.assertEqual(result['posts'][2]['title'], '21')
 
         self.page = 6
         response = self.app.get('/api/postslist/' + str(self.page))
         result = json.loads(response.get_data())
-        self.assertEqual(len(result), 0)
+        self.assertEqual(len(result['posts']), 0)
 
         self.page = 0 # devuelve primer pagina
         response = self.app.get('/api/postslist/' + str(self.page))
         result = json.loads(response.get_data())
-        self.assertEqual(len(result), 5)
-        self.assertEqual(result[0]['title'], 'Title Test')
-        self.assertEqual(result[4]['title'], '3')
+        self.assertEqual(len(result['posts']), 5)
+        self.assertEqual(result['posts'][0]['title'], 'Title Test')
+        self.assertEqual(result['posts'][4]['title'], '3')
 
     def test_get_with_param_id(self):
         response = self.app.get('/api/posts/' + self.post_id_no_valid)
@@ -122,9 +122,9 @@ class TestPost(unittest.TestCase):
 
         response = self.app.get('/api/postslist/' + str(self.page))
         result = json.loads(response.get_data())
-        self.assertEqual(len(result), 3)
-        self.assertEqual(result[2]['title'], 'titulo post')
-        self.assertEqual(result[2]['author'], 'test_author')
+        self.assertEqual(len(result['posts']), 3)
+        self.assertEqual(result['posts'][2]['title'], 'titulo post')
+        self.assertEqual(result['posts'][2]['author'], 'test_author')
 
     def test_put(self):
         response = self.app.put('/api/posts/' + self.post_id)
@@ -166,7 +166,7 @@ class TestPost(unittest.TestCase):
 
         response = self.app.get('/api/postslist/' + str(self.page))
         result = json.loads(response.get_data())
-        self.assertEqual(len(result), 1)
+        self.assertEqual(len(result['posts']), 1)
 
         response = self.app.get('/api/posts/' + self.post_id)
         result = json.loads(response.get_data())
