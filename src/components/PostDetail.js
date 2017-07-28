@@ -5,7 +5,7 @@ import {Parser} from 'html-to-react';
 import {getPost} from '../api/BlogAPI';
 import {getDateTime} from '../utils/getDateTime';
 import CommentForm from './CommentForm';
-import PostComments from './PostComments';
+import Comment from './Comment';
 
 export default class PostDetail extends React.Component {
   constructor(props) {
@@ -44,7 +44,7 @@ export default class PostDetail extends React.Component {
             <Well>
               <h2>{this.state.post.title}</h2>
               <div className='text-primary text-right post-author'>
-                {this.state.post.author} - {postDateTime}
+                {postDateTime}
               </div>
               <div className='lead text-justify'>
                 <p>{textPost}</p>
@@ -56,7 +56,7 @@ export default class PostDetail extends React.Component {
         </Row>
         <Row>
           <Col>
-            <PostComments comments={commentList} />
+            <Comment comments={commentList} />
           </Col>
         </Row>
         <Row>

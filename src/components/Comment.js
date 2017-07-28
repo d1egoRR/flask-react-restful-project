@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {Col, Row, Well, Jumbotron} from 'react-bootstrap';
 import {getDateTime} from '../utils/getDateTime';
 
-function PostComments(props) {
+function Comment(props) {
   let commentDateTime = '';
   const totalComments = props.comments.length;
   const commentList = props.comments.map(function(comment, index) {
@@ -32,8 +32,8 @@ function PostComments(props) {
   );
 }
 
-PostComments.propTypes = {
+Comment.propTypes = {
   comments: PropTypes.array.isRequired
 };
 
-export default PostComments;
+export default Comment;

@@ -24,7 +24,7 @@ function Post(props) {
     <Well>
       <h2>{props.post.title}</h2>
       <div className='text-primary text-right post-author'>
-        {props.post.author} - {postDateTime}
+        {postDateTime}
       </div>
       <div className='lead text-justify'>
         <p>{textPost}...</p>

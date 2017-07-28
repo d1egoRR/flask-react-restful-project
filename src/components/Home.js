@@ -1,5 +1,5 @@
 import React from 'react';
-import {Grid} from 'react-bootstrap';
+import {Col, Grid, Well, Row} from 'react-bootstrap';
 import {Link} from 'react-router-dom';
 import PostsList from './PostsList';
 import {getPostsList} from '../api/BlogAPI';
@@ -25,7 +25,9 @@ export default class Home extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      currentPage: parseInt(nextProps.match.params.page)
+      currentPage: parseInt(nextProps.match.params.page),
+      posts: [],
+      postsCount: 0
     });
     this.getPostsListData(nextProps.match.params.page);
   }
@@ -52,21 +54,32 @@ export default class Home extends React.Component {
       <div>
         <PostsList posts={this.state.posts} />
         <Grid>
-          {(previousPage)
-            ? <div key={previousPage}>
-                <Link to={`/posts/${previousPage}`} >
-                  &larr; Página Anterior
-                </Link>
-              </div>
-            : ''}
-
-          {(nextPage)
-            ? <div key={nextPage}>
-                <Link to={`/posts/${nextPage}`} >
-                  Página Siguiente &rarr;
-                </Link>
-              </div>
-            : ''}
+          <Well bsSize="small">
+            <Row>
+              <Col className='col-xs-6'>
+                <div className='text-center'>
+                  {(previousPage)
+                    ? <div className='previous-next-page' key={previousPage}>
+                        <Link to={`/posts/page/${previousPage}`} >
+                          &larr; Página Anterior
+                        </Link>
+                      </div>
+                    : ''}
+                </div>
+              </Col>
+              <Col className='col-xs-6'>
+                <div className='text-center'>
+                  {(nextPage)
+                    ? <div className='previous-next-page' key={nextPage}>
+                        <Link to={`/posts/page/${nextPage}`} >
+                          Página Siguiente &rarr;
+                        </Link>
+                      </div>
+                    : ''}
+                </div>
+              </Col>
+            </Row>
+          </Well>
         </Grid>
       </div>
     );
