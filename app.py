@@ -124,7 +124,8 @@ api.add_resource(Post, '/api/posts/<string:post_id>')
 
 
 class CommentAdd(Resource):
-    def put(self, post_id):
+    @crossdomain(origin='*')
+    def post(self, post_id):
         args = parser.parse_args()
 
         if not ObjectId.is_valid(post_id):

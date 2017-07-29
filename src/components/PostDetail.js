@@ -6,19 +6,44 @@ import {getPost} from '../api/BlogAPI';
 import {getDateTime} from '../utils/getDateTime';
 import CommentForm from './CommentForm';
 import Comment from './Comment';
+import {addComment} from '../api/BlogAPI';
 
 export default class PostDetail extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       "id" : this.props.match.params.id,
-      "post": []
+      "post": [],
+      "comments": []
     }
   }
 
   componentDidMount() {
     getPost(this.state.id, post => {
-      this.setState({post: post});
+      this.setState({
+        post: post,
+        comments: post.comments
+      });
+    });
+  }
+
+  addNewComment(comment) {
+    // DEVOLVER EN EL RESULT DE ADD COMMENT EL NUEVO COMMENT
+    // CUANDO SE GRABA SIEMPRE DEVOLVER LO QUE SE GRABA APARTE DEL RESULT TRUE
+    // ARREGLAR TEST
+    // CAMBIAR PUT X POST
+    addComment(this.state.id, comment, addOk => {
+      if (addOk.result) {
+        const currentComments = this.state.comments;
+        const newComment = {
+          author: comment.author,
+          date: comment.date,
+          text_comment: comment.text_comment
+        }
+
+        currentComments.push(newComment);
+        this.setState({comments: currentComments});
+      }
     });
   }
 
@@ -33,9 +58,7 @@ export default class PostDetail extends React.Component {
       });
     }
 
-    const commentList = (this.state.post["comments"])
-                      ? this.state.post.comments
-                      : [];
+    console.log(this.state.comments);
 
     return(
       <Grid>
@@ -56,12 +79,12 @@ export default class PostDetail extends React.Component {
         </Row>
         <Row>
           <Col>
-            <Comment comments={commentList} />
+            <Comment comments={this.state.comments} />
           </Col>
         </Row>
         <Row>
           <Col>
-            <CommentForm />
+            <CommentForm handleAddComment={::this.addNewComment} />
           </Col>
         </Row>
       </Grid>
